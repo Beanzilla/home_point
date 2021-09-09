@@ -34,7 +34,7 @@ minetest.register_chatcommand("sh", {
     func = function(name, param)
         -- Don't allow players who aren't online
         if name ~= "singleplayer" then
-            if minetest.get_player_by_name(name) or nil == nil then return false, "You must be online to use this command" end
+            if minetest.get_player_by_name(name) == nil then return false, "You must be online to use this command" end
         end
         local place = string.match(param, "^([%a%d_-]+)") or ""
         if place ~= "" then
@@ -56,7 +56,7 @@ minetest.register_chatcommand("h", {
     func = function(name, param)
         -- Don't allow players who aren't online
         if name ~= "singleplayer" then
-            if minetest.get_player_by_name(name) or nil == nil then return false, "You must be online to use this command" end
+            if minetest.get_player_by_name(name) == nil then return false, "You must be online to use this command" end
         end
         local place = string.match(param, "^([%a%d_-]+)") or ""
         local target = nil
