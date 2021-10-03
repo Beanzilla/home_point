@@ -39,7 +39,7 @@ minetest.register_chatcommand("sh", {
         local place = string.match(param, "^([%a%d_-]+)") or ""
         if place ~= "" then
             minetest.log("action", "[home_point] "..name.." saves a point as '"..place.."'")
-            return home_point.save(name, place), "Saved as "..(place
+            return home_point.save(name, place), "Saved as "..place
         else
             minetest.log("action", "[home_point] "..name.." saves a point as '"..name.."'")
             return home_point.save(name, name), "Saved as "..name
@@ -94,12 +94,12 @@ minetest.register_chatcommand("rh", {
         local target = nil
         if place ~= "" then
             home_point.remove(name, place)
-            minetest.log("action", "[home_point] "..name.." removes home of '"..place.."'"
-            minetest.chat_send_player(name, ""..place.." removed"
+            minetest.log("action", "[home_point] "..name.." removes home of '"..place.."'")
+            minetest.chat_send_player(name, ""..place.." removed")
         else
             home_point.remove(name, name)
-            minetest.log("action", "[home_point] "..name.." removes home of '"..name.."'"
-            minetest.chat_send_player(name, ""..name.." removed"
+            minetest.log("action", "[home_point] "..name.." removes home of '"..name.."'")
+            minetest.chat_send_player(name, ""..name.." removed")
         end
     end,
 })
