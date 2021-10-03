@@ -39,10 +39,10 @@ minetest.register_chatcommand("sh", {
         local place = string.match(param, "^([%a%d_-]+)") or ""
         if place ~= "" then
             minetest.log("action", "[home_point] "..name.." saves a point as '"..place.."'")
-            return home_point.save(name, home_point.firstToUpper(place)), "Saved as "..home_point.firstToUpper(place)
+            return home_point.save(name, place), "Saved as "..(place
         else
             minetest.log("action", "[home_point] "..name.." saves a point as '"..name.."'")
-            return home_point.save(name, home_point.firstToUpper(name)), "Saved as "..home_point.firstToUpper(name)
+            return home_point.save(name, name), "Saved as "..name
         end
         return false, "Uable to determine place_name"
     end,
@@ -61,13 +61,13 @@ minetest.register_chatcommand("h", {
         local place = string.match(param, "^([%a%d_-]+)") or ""
         local target = nil
         if place ~= "" then
-            target = home_point.get(name, home_point.firstToUpper(place))
+            target = home_point.get(name, place)
             minetest.log("action", "[home_point] "..name.." teleports to '"..place.."'")
-            minetest.chat_send_player(name, "Teleported to "..home_point.firstToUpper(place))
+            minetest.chat_send_player(name, "Teleported to "..place)
         else
-            target = home_point.get(name, home_point.firstToUpper(name))
+            target = home_point.get(name, name)
             minetest.log("action", "[home_point] "..name.." teleports to '"..name.."'")
-            minetest.chat_send_player(name, "Teleported to "..home_point.firstToUpper(name))
+            minetest.chat_send_player(name, "Teleported to "..name)
         end
         if target ~= "" then
             local p = minetest.get_player_by_name(name)
@@ -76,6 +76,30 @@ minetest.register_chatcommand("h", {
         else
             minetest.log("action", "[home_point] Failed to obtain place_name '"..place.."'")
             return false, "Invalid place_name or you have no home points, try /sh (place_name)"
+        end
+    end,
+})
+
+minetest.register_chatcommand("rh", {
+    privs = {
+        home_point = true
+    },
+    description = "Remvoes a home point given /rh (place_name)",
+    func = function(name, param)
+                -- Don't allow players who aren't online
+        if name ~= "singleplayer" then
+            if minetest.get_player_by_name(name) == nil then return false, "You must be online to use this command" end
+        end
+        local place = string.match(param, "^([%a%d_-]+)") or ""
+        local target = nil
+        if place ~= "" then
+            home_point.remove(name, place)
+            minetest.log("action", "[home_point] "..name.." removes home of '"..place.."'"
+            minetest.chat_send_player(name, ""..place.." removed"
+        else
+            home_point.remove(name, name)
+            minetest.log("action", "[home_point] "..name.." removes home of '"..name.."'"
+            minetest.chat_send_player(name, ""..name.." removed"
         end
     end,
 })
