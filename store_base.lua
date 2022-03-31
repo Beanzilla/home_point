@@ -7,7 +7,7 @@ function home_point.save(pname, place_name)
     if p ~= nil then
         -- Get their position and convert it to string
         local pos = p:get_pos()
-        pos = "".. pos.x .." ".. pos.y .." ".. pos.z
+        pos = "".. math.floor(pos.x) .." ".. math.floor(pos.y+1) .." ".. math.floor(pos.z)
         -- Obtain the player's homes update/insert then update the mods storage
         local tmp = minetest.deserialize(home_point.storage:get_string(pname)) or {}
         tmp[place_name] = pos        
@@ -38,6 +38,7 @@ function home_point.get(pname, place_name)
     return ""
 end
 
+-- Removes the location by name
 function home_point.remove(pname, place_name)
     local p = minetest.get_player_by_name(pname) or nil
     if p ~= nil then
@@ -57,5 +58,13 @@ function home_point.remove(pname, place_name)
                 home_point.storage:set_string(pname, minetest.serialize(tmp))
             end
         end
+    end
+end
+
+-- Returns list of home and position for a player
+function home_point.list(pname)
+    local p = minetest.get_player_by_name(pname) or nil
+    if p ~= nil then
+        return minetest.deserialize(home_point.storage:get_string(pname))
     end
 end
