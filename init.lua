@@ -24,8 +24,9 @@ function home_point.split(inputstr, sep)
     return t
 end
 
-minetest.register_privilege("home_point", "Gives access to /sh and /h from home point")
+minetest.register_privilege("home_point", "Gives access to home point")
 
+-- Set home
 minetest.register_chatcommand("sh", {
     privs = {
         home_point = true
@@ -48,6 +49,7 @@ minetest.register_chatcommand("sh", {
     end,
 })
 
+-- Home (Go home)
 minetest.register_chatcommand("h", {
     privs = {
         home_point = true
@@ -80,6 +82,7 @@ minetest.register_chatcommand("h", {
     end,
 })
 
+-- Remove home
 minetest.register_chatcommand("rh", {
     privs = {
         home_point = true
@@ -100,6 +103,31 @@ minetest.register_chatcommand("rh", {
             home_point.remove(name, name)
             minetest.log("action", "[home_point] "..name.." removes home of '"..name.."'")
             minetest.chat_send_player(name, ""..name.." removed")
+        end
+    end,
+})
+
+-- List homes
+minetest.register_chatcommand("lh", {
+    privs = {
+        home_point = true
+    },
+    description = "Lists all home points for you",
+    func = function(name)
+        -- Don't allow offline players
+        if name ~= "singleplayer" then
+            if minetest.get_player_by_name(name) == nil then return false, "You must be online to use this command" end
+        end
+        local list = home_point.list(name)
+        if list ~= nil then
+            local r = "Homes: " .. tostring(#list) .. "\n"
+            for k in pairs(list) do
+                local pos = list[k]
+                r = r .. "  " .. k .. " (" .. tostring(pos[1]) .. ", " .. tostring(pos[2]) .. ", " .. tostring(pos[3]) .. ")\n"
+            end
+            return true, r
+        else
+            minetest.chat_send_player(name, "You don't have any homes yet, use /sh <home_name> to place a home.")
         end
     end,
 })
