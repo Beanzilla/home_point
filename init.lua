@@ -120,10 +120,10 @@ minetest.register_chatcommand("lh", {
         end
         local list = home_point.list(name)
         if list ~= nil then
-            local r = "Homes: " .. tostring(#list) .. "\n"
+            local r = "Homes: " .. tostring(#list+1) .. "\n"
             for k in pairs(list) do
-                local pos = list[k]
-                r = r .. "  " .. k .. " (" .. tostring(pos[1]) .. ", " .. tostring(pos[2]) .. ", " .. tostring(pos[3]) .. ")\n"
+                local pos = list[k].split(list[k], " ")
+                r = r .. "  " .. k .. " (" .. pos[1] .. ", " .. pos[2] .. ", " .. pos[3] .. ")\n"
             end
             return true, r
         else
