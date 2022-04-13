@@ -42,21 +42,16 @@ end
 function home_point.remove(pname, place_name)
     local p = minetest.get_player_by_name(pname) or nil
     if p ~= nil then
-        local indx = 0
-        local found = false
         local tmp = minetest.deserialize(home_point.storage:get_string(pname))
         if tmp ~= nil then
+            -- Make a new table and add all except selected place
+            local new = {}
             for k in pairs(tmp) do
-                if k == place_name then
-                    found = true
-                    break
+                if k ~= place_name then
+                    new[k] = tmp[k]
                 end
-                indx = indx + 1
             end
-            if found == true then
-                table.remove(tmp, indx)
-                home_point.storage:set_string(pname, minetest.serialize(tmp))
-            end
+            home_point.storage:set_string(pname, minetest.serialize(new))
         end
     end
 end
