@@ -2,7 +2,7 @@
 local modpath = minetest.get_modpath("home_point")
 
 home_point = {}
-home_point.version = "1.0"
+home_point.version = "1.1"
 
 home_point.storage = minetest.get_mod_storage()
 home_point.temp = {} -- Used to track who has what waypoints set for what homes
