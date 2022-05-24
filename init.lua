@@ -2,6 +2,7 @@
 local modpath = minetest.get_modpath("home_point")
 
 home_point = {}
+home_point.version = "1.0"
 
 home_point.storage = minetest.get_mod_storage()
 home_point.temp = {} -- Used to track who has what waypoints set for what homes
@@ -24,6 +25,20 @@ function home_point.split(inputstr, sep)
     end
     return t
 end
+
+home_point.color = {
+    white = 0xffffff,
+    black = 0x000000,
+    red = 0xc80000,
+    green = 0x00c800,
+    blue = 0x0055ff, -- Lightened some so it's better visably
+    cyan = 0x00c8ff,
+    magenta = 0xc800c8, -- purple
+    yellow = 0xc8c800,
+    brown = 0x966400,
+    orange = 0xff9600,
+}
+home_point.color.purple = home_point.color.magenta
 
 dofile(modpath..DIR_DELIM.."settings.lua")
 
@@ -251,23 +266,42 @@ minetest.register_chatcommand("wh", {
         if name ~= "singleplayer" then
             if minetest.get_player_by_name(name) == nil then return false, "You must be online to use this command" end
         end
-        local place = string.match(param, "^([%a%d_-]+)") or ""
+        local parts = home_point.split(param, " ")
+        --minetest.log("action", minetest.serialize(parts))
+        local place = ""
+        local color = "white"
+        if #parts >= 1 then
+            place = string.match(parts[1], "^([%a%d_-]+)") or ""
+            --minetest.log("action", "place='"..place.."'")
+        end
+        if #parts >= 2 then
+            color = string.match(parts[2], "^([%a%d_-]+)") or "white"
+            --minetest.log("action", "color='"..color.."'")
+        end
+        -- Check that the color is a valid color that's been converted to HEX
+        color = string.lower(color)
+        for c, hex in pairs(home_point.color) do
+            if c == color then
+                color = hex
+                break
+            end
+        end
         if home_point.count(name) ~= 0 then
             if place ~= "" then
-            if home_point.get(name, place) ~= "" then
-                local rc = home_point.place_waypoint(name, place)
-                if rc.success == true then
-                        minetest.log("action", "[home_point] "..name.." "..rc.errmsg.." at "..place.." '"..home_point.get(name, place).."'")
-                        minetest.chat_send_player(name, rc.errmsg.." at "..place)
+                if home_point.get(name, place) ~= "" then
+                    local rc = home_point.place_waypoint(name, place, color)
+                    if rc.success == true then
+                            minetest.log("action", "[home_point] "..name.." "..rc.errmsg.." at "..place.." '"..home_point.get(name, place).."'")
+                            minetest.chat_send_player(name, rc.errmsg.." at "..place)
+                    else
+                            minetest.log("action", "[home_point] Err="..rc.errmsg.." Val="..minetest.serialize(rc.value))
+                    end
                 else
-                        minetest.log("action", "[home_point] Err="..rc.errmsg.." Val="..minetest.serialize(rc.value))
+                    minetest.chat_send_player(name, "No such home point "..place)
                 end
             else
-                minetest.chat_send_player(name, "No such home point "..place)
-            end
-            else
                 if home_point.get(name, name) ~= "" then
-                    local rc = home_point.place_waypoint(name, name)
+                    local rc = home_point.place_waypoint(name, name, color)
                     if rc.success == true then
                             minetest.log("action", "[home_point] "..name.." "..rc.errmsg.." at "..name.." '"..home_point.get(name, name).."'")
                             minetest.chat_send_player(name, rc.errmsg.." at "..name)
@@ -282,4 +316,4 @@ minetest.register_chatcommand("wh", {
     end
 })
 
-minetest.log("action", "[home_point] Ready")
+minetest.log("action", "[home_point] Version: "..home_point.version)

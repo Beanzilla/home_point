@@ -91,13 +91,11 @@ end
 function home_point.waypoint_is(pname, home)
     if home_point.get(pname, home) ~= "" then
         local waypoints = home_point.temp[pname] or {}
-        --minetest.log("action", minetest.serialize(waypoints))
-        for _, way in pairs(waypoints) do
-            local way_name = way[1]
-            local way_hid = way[2]
-            --minetest.log("action", "[home_point.waypoint_is] way_name='"..way_name.."' way_hid="..tostring(way_hid))
-            if way_name == home then
-                return {success=true, errmsg="", value=way_hid}
+        --minetest.log("action", "94 ".. minetest.serialize(waypoints))
+        for name, way in pairs(waypoints) do
+            --minetest.log("action", "96 ".. minetest.serialize(way))
+            if name == home then
+                return {success=true, errmsg="", value=way}
             end
         end
         return {success=true, errmsg="Home point '"..home.."' doesn't have a waypoint set.", value=-1}
@@ -107,13 +105,13 @@ function home_point.waypoint_is(pname, home)
 end
 
 -- Adds the given hud id to the given home point
-function home_point.waypoint_add(pname, home, hud_id)
+function home_point.waypoint_add(pname, home, hud_id, hex)
     if home_point.get(pname, home) ~= "" then
         local waypoints = home_point.temp[pname] or {}
         local tab = {}
-        table.insert(tab, home)
-        table.insert(tab, hud_id)
-        table.insert(waypoints, tab)
+        tab.hud = hud_id
+        tab.color = hex
+        waypoints[home] = tab
         home_point.temp[pname] = waypoints
         return {success=true, errmsg="", value=tab}
     else
@@ -125,15 +123,14 @@ function home_point.waypoint_remove(pname, home)
     if home_point.get(pname, home) ~= "" then
         local waypoints = home_point.temp[pname] or {}
         local new_waypoints = {}
-        for _, way in pairs(waypoints) do
-            local way_name = way[1]
-            local way_hid = way[2]
-            --minetest.log("action", "[home_point.waypoint_remove] way_name='"..way_name.."' way_hid="..tostring(way_hid))
-            if way_name ~= home then
+        --minetest.log("action", "128 ".. minetest.serialize(waypoints))
+        for name, way in pairs(waypoints) do
+            --minetest.log("action", "130 ".. minetest.serialize(way))
+            if name ~= home then
                 local tab = {}
-                table.insert(tab, way_name)
-                table.insert(tab, way_hid)
-                table.insert(new_waypoints, tab)
+                tab.hud = way.hud
+                tab.color = way.color
+                new_waypoints[name] = tab
             end
         end
         home_point.temp[pname] = new_waypoints
@@ -143,23 +140,39 @@ function home_point.waypoint_remove(pname, home)
     end
 end
 
-function home_point.place_waypoint(pname, home)
+function home_point.place_waypoint(pname, home, hex)
     if home_point.get(pname, home) ~= "" then
         -- Obtain the actual pos
         local raw_pos = home_point.split(home_point.get(pname, home), " ")
         local pos = {x=tonumber(raw_pos[1]), y=tonumber(raw_pos[2]), z=tonumber(raw_pos[3])}
         local player = minetest.get_player_by_name(pname)
+        -- Clean up hex / have backup incase hex isn't HEX but something else
+        local h = hex
+        if type(hex) ~= "number" then
+            h = 0xc80000
+            minetest.chat_send_player(pname, "Invalid color option '"..tostring(hex).."'.")
+            return {success=false, errmsg="Invalid color option '"..tostring(hex).."'.", value=nil}
+        end
 
         local is_way = home_point.waypoint_is(pname, home)
+        -- This will need to chance
         if is_way.success == true then
             if is_way.value ~= -1 then
-                -- Remove
-                local rm = home_point.waypoint_remove(pname, home)
-                if rm.success ~= true then
-                    return {success=false, errmsg="home_point.waypoint_remove returned error", value=rm}
+                if is_way.value.color ~= h then
+                    -- Change instead
+                    player:hud_change(is_way.value.hud, "number", tostring(h))
+                    minetest.log("action", "164 "..minetest.serialize(home_point.temp[pname][home]))
+                    home_point.temp[pname][home].color = h
+                    return {success=true, errmsg="Changed color of waypoint", value=nil}
                 else
-                    player:hud_remove(is_way.value)
-                    return {success=true, errmsg="Removed waypoint", value=nil}
+                    -- Remove
+                    local rm = home_point.waypoint_remove(pname, home)
+                    if rm.success ~= true then
+                        return {success=false, errmsg="home_point.waypoint_remove returned error", value=rm}
+                    else
+                        player:hud_remove(is_way.value.hud)
+                        return {success=true, errmsg="Removed waypoint", value=nil}
+                    end
                 end
             else
                 -- Add
@@ -167,8 +180,8 @@ function home_point.place_waypoint(pname, home)
                     hud_elem_type = "waypoint",
                     world_pos = vector.subtract(pos, {x=0, y=1, z=0}),
                     name = home,
-                    number = 0x00c800
-                }))
+                    number = h
+                }), h)
                 if add.success ~= true then
                     return {success=false, errmsg="home_point.waypoint_add returned error", value=add}
                 else
@@ -183,6 +196,7 @@ function home_point.place_waypoint(pname, home)
     end
 end
 
+-- Clean up waypoints from players who are logged off
 minetest.register_on_leaveplayer(function(player)
     local pname = player:get_player_name()
     if home_point.temp[pname] ~= nil then

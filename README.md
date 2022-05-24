@@ -1,4 +1,4 @@
-# home_point
+# Home Point
 
 A multi homes teleport feature.
 
@@ -13,6 +13,26 @@ All commands require `home_point` privilege (And `/sh` needs one of the further 
 * `/wh (place_name)` Places a waypoint at the designated home till you log-out/quit, if place_name not given then your player name is used.
 
 > `/wh` actually toggles a waypoint, and when `/sh` is used with the same home as a waypoint a new waypoint will be place at the new location. (Also when `/rh` is used on a home with a waypoint the waypoint will be removed)
+
+## Colored Waypoints
+
+Don't like the waypoints being white?
+
+Just use `/wh place_name color` to change it. (This means you need to enter your player name if you want to change that waypoint color)
+
+> Note, selecting the same color will cause it to be removed now (so if you changed it from white you will need to either type in the color you used or enter `/wh place_name` twice, once to change to white and the second time to remove it)
+
+Supported colors:
+
+* White
+* Black
+* Blue
+* Red
+* Orange
+* Yellow
+* Magenta or Purple
+* Brown
+* Green
 
 ## Notice
 
