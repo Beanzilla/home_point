@@ -102,11 +102,11 @@ minetest.register_chatcommand("sh", {
             -- Update a waypoints position if we are showing that home
             local is_way = home_point.waypoint_is(name, place)
             if is_way.success == true and is_way.value ~= -1 then
-                local pl = home_point.place_waypoint(name, place)
+                local pl = home_point.place_waypoint(name, place, is_way.value.color)
                 if pl.success ~= true then
                     minetest.log("action", "[home_point] Err="..pl.errmsg.." Val="..minetest.serialize(pl.value))
                 end
-                pl = home_point.place_waypoint(name, place)
+                pl = home_point.place_waypoint(name, place, is_way.value.color)
                 if pl.success ~= true then
                     minetest.log("action", "[home_point] Err="..pl.errmsg.." Val="..minetest.serialize(pl.value))
                 end
@@ -120,11 +120,11 @@ minetest.register_chatcommand("sh", {
             -- Update a waypoints position if we are showing that home
             local is_way = home_point.waypoint_is(name, name)
             if is_way.success == true and is_way.value ~= -1 then
-                local pl = home_point.place_waypoint(name, name)
+                local pl = home_point.place_waypoint(name, name, is_way.value.color)
                 if pl.success ~= true then
                     minetest.log("action", "[home_point] Err="..pl.errmsg.." Val="..minetest.serialize(pl.value))
                 end
-                pl = home_point.place_waypoint(name, name)
+                pl = home_point.place_waypoint(name, name, is_way.value.color)
                 if pl.success ~= true then
                     minetest.log("action", "[home_point] Err="..pl.errmsg.." Val="..minetest.serialize(pl.value))
                 end
@@ -190,7 +190,8 @@ minetest.register_chatcommand("rh", {
             -- Remove waypoints from deleted homes
             local is_way = home_point.waypoint_is(name, place)
             if is_way.success and is_way.value ~= -1 then
-                local place_way = home_point.place_waypoint(name, place)
+                home_point.place_waypoint(name, place, home_point.color.black)
+                local place_way = home_point.place_waypoint(name, place, home_point.color.black)
                 if place_way.success == true then
                     minetest.log("action", "[home_point] "..name.." removed waypoint at '"..place.."'")
                 else
@@ -198,7 +199,7 @@ minetest.register_chatcommand("rh", {
                 end
             end
             if home_point.remove(name, place) then
-                minetest.chat_send_player(name, reps)
+                minetest.chat_send_player(name, resp)
             end
         else
             minetest.log("action", "[home_point] "..name.." removes home of '"..name.."'")
@@ -207,7 +208,8 @@ minetest.register_chatcommand("rh", {
             -- Remove waypoints from deleted homes
             local is_way = home_point.waypoint_is(name, name)
             if is_way.success and is_way.value ~= -1 then
-                local place_way = home_point.place_waypoint(name, name)
+                home_point.place_waypoint(name, place, home_point.color.black)
+                local place_way = home_point.place_waypoint(name, name, home_point.color.black)
                 if place_way.success == true then
                     minetest.log("action", "[home_point] "..name.." removed waypoint at '"..name.."'")
                 else
@@ -215,7 +217,7 @@ minetest.register_chatcommand("rh", {
                 end
             end
             if home_point.remove(name, name) then
-                minetest.chat_send_player(name, reps)
+                minetest.chat_send_player(name, resp)
             end
         end
     end,
