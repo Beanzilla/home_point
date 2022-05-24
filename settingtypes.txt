@@ -1,0 +1,9 @@
+
+# Limits how many homes basic users can use
+home_point.home_point_basic (Home Point Basic) int 2
+
+# Limits how many homes advanced users can use
+home_point.home_point_advanced (Home Point Advanced) int 4
+
+# Limits how many homes super users can use
+home_point.home_point_super (Home Point Super) int 8

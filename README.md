@@ -1,16 +1,44 @@
 # home_point
 
-A /sethome and /home mod for Minetest
+A multi homes teleport feature.
 
-## CMDs
+## Commands
 
-All commands require `home_point` priviledge
+All commands require `home_point` privilege (And `/sh` needs one of the further privileges, See Limiting homes section below)
 
 * `/h (place_name)` Goes to a place called place_name unless not given then your player name is used.
 * `/sh (place_name)` Saves a place called place_name unless not given then your player name is used.
 * `/rh (place_name)` Removes a place called place_name unless not given then your player name is used.
 * `/lh` Lists all your homes, if you don't have any it will tell you how to make one.
+* `/wh (place_name)` Places a waypoint at the designated home till you log-out/quit, if place_name not given then your player name is used.
+
+> `/wh` actually toggles a waypoint, and when `/sh` is used with the same home as a waypoint a new waypoint will be place at the new location. (Also when `/rh` is used on a home with a waypoint the waypoint will be removed)
 
 ## Notice
 
-This mod uses mod storage... this means if the server crashes the mod will lose a few home points.
+This mod uses mod storage... this means if the server crashes the mod could lose a few home points.
+
+## Limiting homes
+
+There are 4 default privileges which are defined in settings.
+
+All these do is limit the number of home_points players can set.
+
+> (For servers) This means you need to add `home_point` and at least `home_point_basic` to your default_privs in minetest.conf,
+so new players can at least use home_point. (See [here](https://github.com/minetest/minetest/blob/master/builtin/settingtypes.txt#L1166) for info on default_privs in minetest.conf)
+
+### home_point_basic
+
+Defaults to max of 2 homes (Change with `home_point.home_point_basic` in settings)
+
+### home_point_advanced
+
+Defaults to max of 4 homes (Change with `home_point.home_point_advanced` in settings)
+
+### home_point_super
+
+Defaults to max of 8 homes (Change with `home_point.home_point_super` in settings)
+
+### home_point_unlimited
+
+Allows unlimited number of homes (Not defined in settings, as unlimited is assumed to be unlimited)
