@@ -2,7 +2,7 @@
 local modpath = minetest.get_modpath("home_point")
 
 home_point = {}
-home_point.version = "1.1"
+home_point.version = "2.0"
 
 home_point.storage = minetest.get_mod_storage()
 home_point.temp = {} -- Used to track who has what waypoints set for what homes
@@ -41,6 +41,10 @@ home_point.color = {
 home_point.color.purple = home_point.color.magenta
 
 dofile(modpath..DIR_DELIM.."settings.lua")
+
+-- Adds a tracker api so we can identify if someone moved or not, else requests go thru
+-- This also allows the player to change their teleport destination while waiting (will/should reset timer)
+dofile(modpath..DIR_DELIM.."tracker.lua")
 
 minetest.register_privilege("home_point", {
     description = "Gives access to home point commands",
@@ -153,16 +157,18 @@ minetest.register_chatcommand("h", {
         if place ~= "" then
             target = home_point.get(name, place)
             minetest.log("action", "[home_point] "..name.." teleports to '"..place.."'")
-            minetest.chat_send_player(name, "Teleported to "..place)
+            --minetest.chat_send_player(name, "Teleported to "..place)
         else
             target = home_point.get(name, name)
             minetest.log("action", "[home_point] "..name.." teleports to '"..name.."'")
-            minetest.chat_send_player(name, "Teleported to "..name)
+            --minetest.chat_send_player(name, "Teleported to "..name)
         end
         if target ~= "" then
             local p = minetest.get_player_by_name(name)
             local pos = target.split(target, " ")
-            p:set_pos({x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])})
+            home_point.players[name].request = {x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])} -- Queue up teleport
+            minetest.chat_send_player(name, "Teleporting to "..name.." in "..tostring(home_point.getJumpSpeed(name)).." seconds (Don't move)")
+            -- In 5 seconds left we show countdown
         else
             minetest.log("action", "[home_point] Failed to obtain place_name '"..place.."'")
             return false, "Invalid place_name or you have no home points, try /sh (place_name)"
@@ -198,6 +204,12 @@ minetest.register_chatcommand("rh", {
                     minetest.log("action", "[home_point] Err="..place_way.errmsg.." Val="..minetest.serialize(place_way.value))
                 end
             end
+            local target = home_point.get(name, place)
+            local pos = target.split(target, " ") -- Remove teleport dest if we've removed home homepoint
+            if home_point.players[name].request == {x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])} then
+                home_point.players[name].request = nil
+                minetest.chat_send_player(name, "Teleport Canceled, Removed Home!")
+            end
             if home_point.remove(name, place) then
                 minetest.chat_send_player(name, resp)
             end
@@ -215,6 +227,12 @@ minetest.register_chatcommand("rh", {
                 else
                     minetest.log("action", "[home_point] Err="..place_way.errmsg.." Val="..minetest.serialize(place_way.value))
                 end
+            end
+            local target = home_point.get(name, name)
+            local pos = target.split(target, " ") -- Remove teleport dest if we've removed home homepoint
+            if home_point.players[name].request == {x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])} then
+                home_point.players[name].request = nil
+                minetest.chat_send_player(name, "Teleport Canceled, Removed Home!")
             end
             if home_point.remove(name, name) then
                 minetest.chat_send_player(name, resp)
@@ -244,6 +262,7 @@ minetest.register_chatcommand("lh", {
                 if is_way.success == false then
                     minetest.log("action", "[home_point] Err="..is_way.errmsg.." Val="..minetest.serialize(is_way.value))
                 end
+                -- Add a * to the end if we are showing that home with a waypoint
                 if is_way.success == true and is_way.value ~= -1 then
                     r = r .. "  " .. k .. " (" .. pos[1] .. ", " .. pos[2] .. ", " .. pos[3] .. ") *\n"
                 else
