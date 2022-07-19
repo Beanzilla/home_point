@@ -45,7 +45,7 @@ end)
 
 home_point.getJumpSpeed = function (name)
     if minetest.check_player_privs(name, {home_point_unlimited=true}) then
-        return 5
+        return home_point.home_point_unlimited_jump_speed
     elseif minetest.check_player_privs(name, {home_point_super=true}) then
         return home_point.home_point_super_jump_speed
     elseif minetest.check_player_privs(name, {home_point_advanced=true}) then
