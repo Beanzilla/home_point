@@ -9,8 +9,8 @@ end
 
 home_point.home_point_basic_jump_speed = minetest.settings:get('home_point.home_point_basic_jump_speed')
 if home_point.home_point_basic_jump_speed == nil then
-    home_point.home_point_basic_jump_speed = 15
-    minetest.settings:set('home_point.home_point_basic_jump_speed', 15)
+    home_point.home_point_basic_jump_speed = 13
+    minetest.settings:set('home_point.home_point_basic_jump_speed', 13)
 else
     home_point.home_point_basic_jump_speed = tonumber(home_point.home_point_basic_jump_speed)
 end
@@ -45,4 +45,12 @@ if home_point.home_point_super_jump_speed == nil then
     minetest.settings:set('home_point.home_point_super_jump_speed', 7)
 else
     home_point.home_point_super_jump_speed = tonumber(home_point.home_point_super_jump_speed)
+end
+
+home_point.home_point_unlimited_jump_speed = minetest.settings:get('home_point.home_point_unlimited_jump_speed')
+if home_point.home_point_unlimited_jump_speed == nil then
+    home_point.home_point_unlimited_jump_speed = 5
+    minetest.settings:set('home_point.home_point_unlimited_jump_speed', 5)
+else
+    home_point.home_point_unlimited_jump_speed = tonumber(home_point.home_point_unlimited_jump_speed)
 end
