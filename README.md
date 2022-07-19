@@ -57,7 +57,7 @@ so new players can at least use home_point. (See [here](https://github.com/minet
 
 Defaults to max of 2 homes (Change with `home_point.home_point_basic` in settings)
 
-With a jump speed of 15 seconds (Change with `home_point.home_point_basic_jump_speed` in settings)
+With a jump speed of 13 seconds (Change with `home_point.home_point_basic_jump_speed` in settings)
 
 ### home_point_advanced
 
@@ -75,5 +75,4 @@ With a jump speed of 7 seconds (Change with `home_point.home_point_super_jump_sp
 
 Allows unlimited number of homes (Not defined in settings, as unlimited is assumed to be unlimited)
 
-Forcebly defined at 5 seconds (Not defined in settings)
-
+With a jump speed of 5 seconds (Change with `home_point.home_point_unlimited_junp_speed` in settings)
